@@ -1,0 +1,16 @@
+{
+  "name": "awsSnsToSlack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "awsSnsToSlack.labmda.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^5.2.0",
+    "should": "^13.2.3"
+  }
+}
