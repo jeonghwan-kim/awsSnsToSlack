@@ -1,6 +1,6 @@
 const https = require('https')
-const channel = process.env.SLACK_CHANNEL
 const webhookPath = process.env.SLACK_WEBHOOK_PATH
+const channel = process.env.SLACK_CHANNEL
 const icon_emoji = process.env.ICON_EMOJI || ':robot_face:'
 const username = process.env.USERNAME || 'AWS'
 const errorKeywords = process.env.ERROR_KEYWORDS || 'Unsuccessful command, to Degraded, Failed'
@@ -11,15 +11,16 @@ const validateEnvVars = _ => {
   if (!channel) throw Error(`${tag} SLACK_CHANNEL is required`)
 }
 
-const highlightMessage = msg => {
+const highlightMessage = (msg, idx = 0) => {
   const sentences = msg.split('.')
-  sentences[0] = `*${sentences[0]}*`
+  sentences[idx] = `*${sentences[idx]}*`
   return sentences.join('.')
 }
 
-const parseEvent = event => {
+const parseSnsMsg = ({ Message }) => {
   try {
-    const { Message } = event.Records[0].Sns
+    const isPlainText = !Message.includes('\n')
+    if (isPlainText) return Message
 
     const parts = Message.split('\n')
     const data = {}
@@ -49,10 +50,10 @@ const isErrorMessage = msg => {
 }
 
 const buildAttachments = event => {
-  const evtMap = parseEvent(event)
-  if (!evtMap) return ''
+  const msgMap = parseSnsMsg(event.Records[0].Sns)
+  if (!msgMap) return ''
 
-  const { Message, Environment } = evtMap
+  const { Message, Environment } = msgMap
 
   const color = isErrorMessage(Message) ? 'danger' : 'good'
   return [
